@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPA & CGPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 50%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        select, input {
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>SGPA & CGPA Calculator</h2>
+    <table id="subjectsTable">
+        <tr>
+            <th>Grade</th>
+            <th>Credits</th>
+            <th>Action</th>
+        </tr>
+    </table>
+    <button onclick="addSubject()">Add Subject</button>
+    <button onclick="calculateSGPA()">Calculate SGPA</button>
+    <button onclick="resetSGPA()">Reset</button>
+    <h3 id="sgpaResult"></h3>
+
+    <h2>CGPA Calculator</h2>
+    <div id="cgpaContainer">
+        <input type="text" class="sgpaInput" placeholder="Enter SGPA">
+    </div>
+    <button onclick="addSemester()">Add Semester</button>
+    <button onclick="calculateCGPA()">Calculate CGPA</button>
+    <button onclick="resetCGPA()">Reset</button>
+    <h3 id="cgpaResult"></h3>
+
+    <script>
+        function addSubject() {
+            let table = document.getElementById("subjectsTable");
+            let row = table.insertRow(-1);
+            let gradeCell = row.insertCell(0);
+            let creditCell = row.insertCell(1);
+            let actionCell = row.insertCell(2);
+            
+            gradeCell.innerHTML = `<select>
+                <option value="10">O</option>
+                <option value="9">A+</option>
+                <option value="8">A</option>
+                <option value="7">B+</option>
+                <option value="6">B</option>
+                <option value="5">C</option>
+                <option value="0">F</option>
+                <option value="0">Ab</option>
+            </select>`;
+            creditCell.innerHTML = `<input type="number" step="0.1" min="0" value="0">`;
+            actionCell.innerHTML = `<button onclick="removeSubject(this)" style="background: red;">Remove</button>`;
+        }
+
+        function removeSubject(button) {
+            let row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        function calculateSGPA() {
+            let table = document.getElementById("subjectsTable");
+            let rows = table.getElementsByTagName("tr");
+            let totalCredits = 0, weightedSum = 0;
+            
+            for (let i = 1; i < rows.length; i++) {
+                let grade = parseFloat(rows[i].cells[0].getElementsByTagName("select")[0].value);
+                let credits = parseFloat(rows[i].cells[1].getElementsByTagName("input")[0].value);
+                
+                if (!isNaN(credits) && credits > 0) {
+                    totalCredits += credits;
+                    weightedSum += grade * credits;
+                }
+            }
+            let sgpa = totalCredits ? (weightedSum / totalCredits).toFixed(2) : "N/A";
+            document.getElementById("sgpaResult").innerText = `SGPA: ${sgpa}`;
+            if (sgpa !== "N/A" && sgpa < 7.0) {
+                document.getElementById("sgpaResult").innerText += " \nEmundhi le inka paduko 😂";
+            }
+        }
+
+        function resetSGPA() {
+            document.getElementById("subjectsTable").innerHTML = "<tr><th>Grade</th><th>Credits</th><th>Action</th></tr>";
+            document.getElementById("sgpaResult").innerText = "";
+        }
+
+        function addSemester() {
+            let container = document.getElementById("cgpaContainer");
+            let input = document.createElement("input");
+            input.type = "text";
+            input.className = "sgpaInput";
+            input.placeholder = "Enter SGPA";
+            container.appendChild(document.createElement("br"));
+            container.appendChild(input);
+        }
+
+        function calculateCGPA() {
+            let sgpaInputs = document.getElementsByClassName("sgpaInput");
+            let sgpaArray = Array.from(sgpaInputs).map(input => parseFloat(input.value)).filter(num => !isNaN(num) && num >= 0);
+            let cgpa = sgpaArray.length ? (sgpaArray.reduce((a, b) => a + b, 0) / sgpaArray.length).toFixed(2) : "N/A";
+            document.getElementById("cgpaResult").innerText = `CGPA: ${cgpa}`;
+            if (cgpa !== "N/A" && cgpa < 7.0) {
+                document.getElementById("cgpaResult").innerText += " \nEmundhi le inka paduko 😂";
+            }
+        }
+
+        function resetCGPA() {
+            document.getElementById("cgpaContainer").innerHTML = '<input type="text" class="sgpaInput" placeholder="Enter SGPA">';
+            document.getElementById("cgpaResult").innerText = "";
+        }
+    </script>
+</body>
+</html>
